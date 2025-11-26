@@ -95,7 +95,7 @@ public class AuthController {
 
     @PostMapping("/forgot-password/validate-otp")
     public ResponseEntity<?> validateOtp(@RequestBody ValidateOtpRequest validateOtpRequest) {
-        User user = userService.findByUsername(validateOtpRequest.getUsername().toLowerCase())
+        userService.findByUsername(validateOtpRequest.getUsername().toLowerCase())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Map<String, Object> resp = new HashMap<>();

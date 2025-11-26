@@ -51,11 +51,11 @@ public class UserSessionServiceImpl implements UserSessionService {
     }
 
     @Override
-    public UserSession createUserSession(User user, String content) {
+    public void createUserSession(User user, String content) {
         UserSession session = new UserSession();
         session.setUser(user);
         session.setContent(content);
-        return userSessionRepository.save(session);
+        userSessionRepository.save(session);
     }
 
     @Override
