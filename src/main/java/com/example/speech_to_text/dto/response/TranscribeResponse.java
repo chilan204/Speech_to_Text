@@ -6,5 +6,5 @@ import lombok.Data;
 public class TranscribeResponse {
     private String text;
     private String language;
-    private String model;
+    private boolean status;
 }

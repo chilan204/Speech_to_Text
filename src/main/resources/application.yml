@@ -31,3 +31,17 @@ app:
   whisper:
     url: http://127.0.0.1:5001
     timeout-seconds: 120
+
+  init:
+    admin:
+      username: admin
+      password: admin
+      email: admin@example.com
+      name: Administrator
+      phone: "000000000"
+
+application:
+  jwt:
+    secretKey: Q7vJm3s9LpT2rX6YkB8NzW1eF0H5aD4Gc
+    accessExpiration: 86400000
+    refreshExpiration: 86400000

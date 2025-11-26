@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "app_user")
+@Table(name = "user")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -22,6 +22,9 @@ public class User extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String username;
 
+    @Column(nullable = false)
+    private String name;
+
     @Column(nullable = false, unique = true)
     private String email;
 
@@ -30,9 +33,6 @@ public class User extends BaseEntity {
 
     @Column(nullable = false, unique = true)
     private String phone;
-
-    @Column(nullable = false, unique = true)
-    private String emCode;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
