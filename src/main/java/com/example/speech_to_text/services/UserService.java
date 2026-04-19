@@ -29,5 +29,5 @@ public interface UserService {
 
     void deleteVoiceSample(Long userId, String fileName);
 
-    User save(User user);
+    void save(User user);
 }
