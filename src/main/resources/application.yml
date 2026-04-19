@@ -3,45 +3,45 @@ spring:
     name: Speech_to_Text
 
   datasource:
-    url: jdbc:mysql://localhost:3306/speech_to_text?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-    username: root
-    password: 123456
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: ${DDL_AUTO:update}
 
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: UTC
 
+server:
+  port: ${SERVER_PORT:8080}
+
 logging:
   level:
-    org.springframework.security: DEBUG
-    org.springframework.web: DEBUG
-    com.example.speech_to_text: DEBUG
-    org.hibernate.SQL: DEBUG
-
-server:
-  port: 8080
-
-app:
-  whisper:
-    url: http://127.0.0.1:5001
-    timeout-seconds: 120
-
-  init:
-    admin:
-      username: admin
-      password: admin
-      email: admin@example.com
-      name: Administrator
-      phone: "000000000"
+    org.springframework.security: ${LOG_SECURITY:INFO}
+    org.springframework.web: ${LOG_WEB:INFO}
+    com.example.speech_to_text: ${LOG_APP:DEBUG}
+    org.hibernate.SQL: ${LOG_SQL:OFF}
 
 application:
   jwt:
-    secretKey: Q7vJm3s9LpT2rX6YkB8NzW1eF0H5aD4Gc
-    accessExpiration: 86400000
-    refreshExpiration: 86400000
+    secretKey: ${JWT_SECRET}
+    accessExpiration: ${JWT_ACCESS_EXP}
+    refreshExpiration: ${JWT_REFRESH_EXP}
+
+app:
+  ai:
+    url: ${AI_URL:http://127.0.0.1:5000}
+    timeout-seconds: ${AI_TIMEOUT:120}
+
+  init:
+    admin:
+      username: ${ADMIN_USERNAME:admin}
+      password: ${ADMIN_PASSWORD:admin}
+      email: ${ADMIN_EMAIL:admin@example.com}
+      name: ${ADMIN_NAME:Administrator}
+      phone: ${ADMIN_PHONE:000000000}

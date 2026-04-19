@@ -6,12 +6,30 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class UserSessionMapper {
-        public UserSessionResponse toResponseDTO(UserSession entity) {
+
+    public UserSessionResponse toResponseDTO(UserSession entity) {
+        if (entity == null) return null;
+
         UserSessionResponse dto = new UserSessionResponse();
+
         dto.setId(entity.getId());
-        dto.setUser_id(entity.getUser().getId());
-        dto.setContent(entity.getContent());
+        dto.setUserId(entity.getUser().getId());
+
+        dto.setTranscript(entity.getTranscript());
+        dto.setAction(entity.getAction());
+        dto.setDirection(entity.getDirection());
+        dto.setValue(entity.getValue());
+
+        dto.setSpeaker(entity.getSpeaker());
+        dto.setSpeakerScore(entity.getSpeakerScore());
+
+        dto.setVerificationScore(entity.getVerificationScore());
+        dto.setVerified(entity.getVerified());
+
+        dto.setRawResponse(entity.getRawResponse());
+
         dto.setCreatedDate(entity.getCreatedDate());
+
         return dto;
     }
 }

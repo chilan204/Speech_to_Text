@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface UserSessionRepository extends JpaRepository<UserSession, Long> {
-    List<UserSession> findByUserIdOrderByIdAsc(Long userId);
+    List<UserSession> findByUserIdOrderByIdDesc(Long userId);
 }
