@@ -1,5 +1,7 @@
-package com.example.speech_to_text.security;
+package com.example.speech_to_text.configuration;
 
+import com.example.speech_to_text.security.JwtAuthenticationEntryPoint;
+import com.example.speech_to_text.security.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +27,7 @@ import java.util.List;
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
-public class SecurityConfig {
+public class SecurityConfiguration {
 
     private final JwtFilter jwtFilter;
     private final JwtAuthenticationEntryPoint authenticationEntryPoint;

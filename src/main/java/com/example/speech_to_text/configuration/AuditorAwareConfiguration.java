@@ -1,4 +1,4 @@
-package com.example.speech_to_text.config;
+package com.example.speech_to_text.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,7 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.Optional;
 
 @Configuration
-public class AuditorAwareConfig {
+public class AuditorAwareConfiguration {
 
     @Bean
     public AuditorAware<String> auditorProvider() {
