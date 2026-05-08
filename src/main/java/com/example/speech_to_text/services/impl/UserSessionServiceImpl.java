@@ -1,12 +1,13 @@
 package com.example.speech_to_text.services.impl;
 
 import com.example.speech_to_text.dto.response.UserSessionResponse;
+import com.example.speech_to_text.dto.response.VoiceCommandResponse;
 import com.example.speech_to_text.entities.User;
 import com.example.speech_to_text.entities.UserSession;
+import com.example.speech_to_text.enums.CommandArbitrationStatus;
 import com.example.speech_to_text.mapper.UserSessionMapper;
 import com.example.speech_to_text.repositories.UserSessionRepository;
 import com.example.speech_to_text.services.UserSessionService;
-import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -46,21 +47,20 @@ public class UserSessionServiceImpl implements UserSessionService {
     }
 
     @Override
-    public void createFromAIResponse(User user, JsonNode node) {
-
+    public void createFromAIResponse(User user, VoiceCommandResponse response) {
         UserSession session = UserSession.builder()
                 .user(user)
-                .transcript(node.path("text").asText(null))
-                .action(node.path("command").path("action").asText(null))
-                .direction(node.path("command").path("direction").asText(null))
-                .value(node.path("command").path("value").asInt())
-                .speaker(node.path("speaker").asText(null))
-                .speakerScore(node.path("speaker_score").asDouble())
-                .verificationScore(node.path("verification_score").asDouble())
-                .verified(node.path("verified").asBoolean())
-                .rawResponse(node.toString())
+                .transcript(response.getText())
+                .speaker(response.getSpeaker())
+                .speakerScore(response.getSpeakerScore())
+                .verificationScore(response.getVerificationScore())
+                .role(response.getRole())
+                .commandStatus(response.getStatus())
+                .executed(
+                        CommandArbitrationStatus.EXECUTED.name()
+                                .equals(response.getStatus()))
+                .rawResponse(response.toString())
                 .build();
-
         repository.save(session);
     }
 

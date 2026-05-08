@@ -1,6 +1,7 @@
 package com.example.speech_to_text.services;
 
 import com.example.speech_to_text.dto.response.UserSessionResponse;
+import com.example.speech_to_text.dto.response.VoiceCommandResponse;
 import com.example.speech_to_text.entities.User;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -13,7 +14,7 @@ public interface UserSessionService {
 
     List<UserSessionResponse> getUserSessionByUserId(Long userId);
 
-    void createFromAIResponse(User user, JsonNode node);
+    void createFromAIResponse(User user, VoiceCommandResponse response);
 
     void deleteUserSession(Long id);
 }

@@ -17,10 +17,18 @@ spring:
     redis:
       host: localhost
       port: 6379
+      password: ${REDIS_PASSWORD:}
+      timeout: 5s
 
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: UTC
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 50MB
+      max-request-size: 50MB
 
 server:
   port: ${SERVER_PORT:8080}
@@ -31,6 +39,8 @@ logging:
     org.springframework.web: ${LOG_WEB:INFO}
     com.example.speech_to_text: ${LOG_APP:DEBUG}
     org.hibernate.SQL: ${LOG_SQL:OFF}
+    org.springframework.data.redis: DEBUG
+    io.lettuce.core: DEBUG
 
 application:
   jwt:

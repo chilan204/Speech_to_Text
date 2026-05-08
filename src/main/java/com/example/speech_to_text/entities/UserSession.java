@@ -50,6 +50,15 @@ public class UserSession extends BaseEntity {
     @Column
     private Boolean verified;
 
+    @Column
+    private String commandStatus;
+
+    @Column
+    private Boolean executed;
+
+    @Column
+    private String role;
+
     @Column(columnDefinition = "TEXT")
     private String rawResponse;
 }

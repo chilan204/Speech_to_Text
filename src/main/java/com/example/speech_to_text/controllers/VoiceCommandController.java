@@ -1,9 +1,12 @@
 package com.example.speech_to_text.controllers;
 
 import com.example.speech_to_text.dto.common.response.ResponseBase;
+import com.example.speech_to_text.dto.response.VoiceCommandResponse;
 import com.example.speech_to_text.entities.User;
+import com.example.speech_to_text.enums.CommandArbitrationStatus;
 import com.example.speech_to_text.repositories.UserRepository;
 import com.example.speech_to_text.services.AIService;
+import com.example.speech_to_text.services.CommandArbitrationService;
 import com.example.speech_to_text.services.UserSessionService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,25 +25,30 @@ public class VoiceCommandController {
     private final ObjectMapper mapper;
     private final UserRepository userRepository;
     private final UserSessionService sessionService;
+    private final CommandArbitrationService arbitrationService;
 
     public VoiceCommandController(
             AIService aiService,
             ObjectMapper mapper,
             UserRepository userRepository,
-            UserSessionService sessionService
+            UserSessionService sessionService,
+            CommandArbitrationService arbitrationService
     ) {
         this.aiService = aiService;
         this.mapper = mapper;
         this.userRepository = userRepository;
         this.sessionService = sessionService;
+        this.arbitrationService = arbitrationService;
     }
 
     @PostMapping
-    public ResponseEntity<ResponseBase<JsonNode>> handle(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<ResponseBase<VoiceCommandResponse>> handle(
+            @RequestParam("file") MultipartFile file
+    ) {
 
         if (file == null || file.isEmpty()) {
             return ResponseEntity.badRequest().body(
-                    ResponseBase.<JsonNode>builder()
+                    ResponseBase.<VoiceCommandResponse>builder()
                             .message("Invalid file")
                             .build()
             );
@@ -48,6 +56,39 @@ public class VoiceCommandController {
 
         try (InputStream is = file.getInputStream()) {
 
+            User user = getCurrentUser();
+
+            if (user == null) {
+                return ResponseEntity.status(401).body(
+                        ResponseBase.<VoiceCommandResponse>builder()
+                                .message("User not found")
+                                .build()
+                );
+            }
+
+            // =========================
+            // 1. ARBITRATION FIRST
+            // =========================
+            CommandArbitrationStatus decision = arbitrationService.processCommand(user);
+
+            // Chỉ lệnh được đánh EXECUTED mới được đi tiếp.
+            if (decision != CommandArbitrationStatus.EXECUTED) {
+
+                VoiceCommandResponse reject = new VoiceCommandResponse();
+                reject.setStatus(decision.name());
+                reject.setRole(user.getRole().name());
+
+                return ResponseEntity.status(403).body(
+                        ResponseBase.<VoiceCommandResponse>builder()
+                                .data(reject)
+                                .message("Rejected by arbitration")
+                                .build()
+                );
+            }
+
+            // =========================
+            // 2. AI ONLY IF ALLOWED
+            // =========================
             String json = aiService.processVoice(is);
 
             if (json == null || json.isBlank()) {
@@ -56,31 +97,31 @@ public class VoiceCommandController {
 
             JsonNode node = mapper.readTree(json);
 
-            if (node.path("status").asText().equals("denied")) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
-                        ResponseBase.<JsonNode>builder()
-                                .data(node)
-                                .message("Unauthorized")
-                                .build()
-                );
-            }
+            VoiceCommandResponse response =
+                    mapper.treeToValue(node, VoiceCommandResponse.class);
 
-            User user = getCurrentUser();
+            // =========================
+            // 3. APPLY ARBITRATION RESULT
+            // =========================
+            response.setStatus(decision.name());
+            response.setRole(user.getRole().name());
 
-            if (user != null) {
-                sessionService.createFromAIResponse(user, node);
-            }
+            // =========================
+            // 4. SAVE SESSION
+            // =========================
+            sessionService.createFromAIResponse(user, response);
 
             return ResponseEntity.ok(
-                    ResponseBase.<JsonNode>builder()
-                            .data(node)
+                    ResponseBase.<VoiceCommandResponse>builder()
+                            .data(response)
                             .message("Success")
                             .build()
             );
 
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(
-                    ResponseBase.<JsonNode>builder()
+
+            return ResponseEntity.internalServerError().body(
+                    ResponseBase.<VoiceCommandResponse>builder()
                             .message(e.getMessage())
                             .build()
             );
@@ -88,7 +129,14 @@ public class VoiceCommandController {
     }
 
     private User getCurrentUser() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userRepository.findByUsername(username).orElse(null);
+
+        String username = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        return userRepository
+                .findByUsername(username)
+                .orElse(null);
     }
 }
